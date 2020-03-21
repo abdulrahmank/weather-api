@@ -1,25 +1,27 @@
 require 'rails_helper'
 
 RSpec.describe WeatherController, type: :controller do
+  before do
+    @temperature_array = [
+        28.5, 27.6, 26.7, 25.9, 25.3, 24.7,
+        24.3, 24.0, 27.1, 34.0, 38.6, 41.3,
+        43.2, 44.4, 45.0, 45.3, 45.1, 44.2,
+        41.9, 38.0, 35.0, 33.0, 31.1, 29.9
+    ]
+  end
   describe '#delete' do
     before do
-      temperature_array = [
-          28.5, 27.6, 26.7, 25.9, 25.3, 24.7,
-          24.3, 24.0, 27.1, 34.0, 38.6, 41.3,
-          43.2, 44.4, 45.0, 45.3, 45.1, 44.2,
-          41.9, 38.0, 35.0, 33.0, 31.1, 29.9
-      ]
       weather1 = Weather.create_with_location({
-                                                 id: 1,
-                                                 date: "1985-01-01",
-                                                 location: {
-                                                     lat: 35.1442,
-                                                     lon: -111.6664,
-                                                     city: "Flagstaff",
-                                                     state: "Arizona"
-                                                 },
-                                                 temperature: temperature_array
-                                             })
+                                                  id: 1,
+                                                  date: "1985-01-01",
+                                                  location: {
+                                                      lat: 35.1442,
+                                                      lon: -111.6664,
+                                                      city: "Flagstaff",
+                                                      state: "Arizona"
+                                                  },
+                                                  temperature: @temperature_array
+                                              })
       weather2 = Weather.create_with_location({
                                                   id: 2,
                                                   date: "1985-01-03",
@@ -29,7 +31,7 @@ RSpec.describe WeatherController, type: :controller do
                                                       city: "Flagstaff",
                                                       state: "Arizona"
                                                   },
-                                                  temperature: temperature_array
+                                                  temperature: @temperature_array
                                               })
       weather3 = Weather.create_with_location({
                                                   id: 3,
@@ -40,7 +42,7 @@ RSpec.describe WeatherController, type: :controller do
                                                       city: "Riyadh",
                                                       state: "Riyadh"
                                                   },
-                                                  temperature: temperature_array
+                                                  temperature: @temperature_array
                                               })
     end
 
@@ -59,7 +61,7 @@ RSpec.describe WeatherController, type: :controller do
         delete :delete, start: "1985-01-01", end: "1985-01-02"
 
         expect(response.status).to eq(200)
-        expect(Weather.where(date: Date.strptime("1985-01-01", DATE_FORMAT)..Date.strptime("1985-01-02", DATE_FORMAT)).count).to eq(0)
+        expect(Weather.where(date: Date.strptime("1985-01-01", DateHelper::DATE_FORMAT)..Date.strptime("1985-01-02", DateHelper::DATE_FORMAT)).count).to eq(0)
       end
     end
 
@@ -73,5 +75,56 @@ RSpec.describe WeatherController, type: :controller do
       end
     end
 
+  end
+
+  describe '#create' do
+    context 'when weather id not present' do
+      it 'should successfully create weather entry' do
+        post :create, {
+            id: 1,
+            date: "1985-01-01",
+            location: {
+                lat: 35.1442,
+                lon: -111.6664,
+                city: "Flagstaff",
+                state: "Arizona"
+            },
+            temperature: @temperature_array
+        }
+
+        expect(response.status).to eq(201)
+        expect(Weather.find(1)).not_to be_nil
+      end
+    end
+
+    context 'when weather id already present' do
+      it 'should return bad request' do
+        Weather.create_with_location({
+                                         id: 1,
+                                         date: "1985-01-01",
+                                         location: {
+                                             lat: 35.1442,
+                                             lon: -111.6664,
+                                             city: "Flagstaff",
+                                             state: "Arizona"
+                                         },
+                                         temperature: @temperature_array
+                                     })
+
+        post :create, {
+            id: 1,
+            date: "1985-01-01",
+            location: {
+                lat: 35.1442,
+                lon: -111.6664,
+                city: "Flagstaff",
+                state: "Arizona"
+            },
+            temperature: @temperature_array
+        }
+
+        expect(response.status).to eq(400)
+      end
+    end
   end
 end
