@@ -127,4 +127,56 @@ RSpec.describe WeatherController, type: :controller do
       end
     end
   end
+
+  describe '#index' do
+    before do
+      weather1 = Weather.create_with_location({
+                                                  id: 1,
+                                                  date: "1985-01-01",
+                                                  location: {
+                                                      lat: 35.1442,
+                                                      lon: -111.6664,
+                                                      city: "Flagstaff",
+                                                      state: "Arizona"
+                                                  },
+                                                  temperature: @temperature_array
+                                              })
+      @weather2 = Weather.create_with_location({
+                                                  id: 2,
+                                                  date: "1985-01-03",
+                                                  location: {
+                                                      lat: 35.1442,
+                                                      lon: -111.6664,
+                                                      city: "Flagstaff",
+                                                      state: "Arizona"
+                                                  },
+                                                  temperature: @temperature_array
+                                              })
+      @weather3 = Weather.create_with_location({
+                                                  id: 3,
+                                                  date: "1985-01-01",
+                                                  location: {
+                                                      lat: 24.7136,
+                                                      lon: 46.6753,
+                                                      city: "Riyadh",
+                                                      state: "Riyadh"
+                                                  },
+                                                  temperature: @temperature_array
+                                              })
+    end
+
+    it 'should get all the weathers for given date' do
+      get :index, date: "1985-01-03"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to eq([@weather2.as_json].to_json)
+    end
+
+    it 'should get all the weathers for given lat and lon' do
+      get :index, lat: 24.7136, lon: 46.6753
+
+      expect(response.status).to eq(200)
+      expect(response.body).to eq([@weather3.as_json].to_json)
+    end
+  end
 end

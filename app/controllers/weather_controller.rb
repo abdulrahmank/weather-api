@@ -29,7 +29,7 @@ class WeatherController < ApplicationController
     weathers = Weather.all.order(id: :asc)
 
     weathers = weathers.where(date: params[:date]) if params[:date]
-    weathers = weathers.include(:location).where(location: {lat: params[:lat], lon: params[:lon]}) if params[:lat] && params[:lon]
+    weathers = weathers.joins(:location).where(locations: {lat: params[:lat], lon: params[:lon]}) if params[:lat] && params[:lon]
 
     render json: weathers.as_json, status: :ok
   end
