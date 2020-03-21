@@ -1,13 +1,15 @@
 class Weather < ActiveRecord::Base
   belongs_to :location
 
+  DATE_FORMAT = "%Y-%m-%d"
+
   def self.create_with_location(params)
     location = Location.create(lat: params[:location][:lat],
                                lon: params[:location][:lon],
                                city: params[:location][:city],
                                state: params[:location][:state])
     self.create(id: params[:id],
-                date: Date.strptime(params[:date], "%Y-%m-%d"),
+                date: Date.strptime(params[:date], DATE_FORMAT),
                 location_id: location.id,
                 temperature: params[:temperature].to_json)
   end
@@ -15,7 +17,7 @@ class Weather < ActiveRecord::Base
   def as_json
     {
         id: self.id,
-        date: self.date,
+        date: self.date.strftime(DATE_FORMAT),
         temperature: ActiveSupport::JSON.decode(self.temperature),
         location: self.location.as_json
     }
