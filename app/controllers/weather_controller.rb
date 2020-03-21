@@ -31,6 +31,8 @@ class WeatherController < ApplicationController
     weathers = weathers.where(date: params[:date]) if params[:date]
     weathers = weathers.joins(:location).where(locations: {lat: params[:lat], lon: params[:lon]}) if params[:lat] && params[:lon]
 
+    render json: [], status: 404 and return if weathers.count == 0 && (params.key?(:date) || params.key?(:lat) && params.key?(:lon))
+
     render json: weathers.as_json, status: :ok
   end
 end

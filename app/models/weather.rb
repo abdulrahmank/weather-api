@@ -10,7 +10,7 @@ class Weather < ActiveRecord::Base
     self.create(id: params[:id],
                 date: Date.strptime(params[:date], DATE_FORMAT),
                 location_id: location.id,
-                temperature: params[:temperature].to_json)
+                temperature: params[:temperature].map{|t| t.to_f }.to_json)
   end
 
   def as_json

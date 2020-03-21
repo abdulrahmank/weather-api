@@ -178,5 +178,31 @@ RSpec.describe WeatherController, type: :controller do
       expect(response.status).to eq(200)
       expect(response.body).to eq([@weather3.as_json].to_json)
     end
+
+    context 'when there are not records for given date' do
+      it 'should return 404' do
+        get :index, date: "1985-01-07"
+
+        expect(response.status).to eq(404)
+      end
+    end
+
+    context 'when there are not records for given lat and lon' do
+      it 'should return 404' do
+        get :index, lat: 54.7136, lon: 46.234234
+
+        expect(response.status).to eq(404)
+      end
+    end
+
+    context 'when there are no weather entries and no params are passed' do
+      it 'should return 200 with empty array' do
+        Weather.all.destroy_all
+
+        get :index
+
+        expect(response.status).to eq(200)
+      end
+    end
   end
 end
