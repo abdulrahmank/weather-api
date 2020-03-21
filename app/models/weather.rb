@@ -1,7 +1,6 @@
 class Weather < ActiveRecord::Base
+  include DateHelper
   belongs_to :location
-
-  DATE_FORMAT = "%Y-%m-%d"
 
   def self.create_with_location(params)
     location = Location.create(lat: params[:location][:lat],
@@ -17,7 +16,7 @@ class Weather < ActiveRecord::Base
   def as_json
     {
         id: self.id,
-        date: self.date.strftime(DATE_FORMAT),
+        date: from_date(self.date),
         temperature: ActiveSupport::JSON.decode(self.temperature),
         location: self.location.as_json
     }

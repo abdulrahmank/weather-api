@@ -26,7 +26,7 @@ RSpec.describe Weather, type: :model do
          .and change{Location.count}.by(1)
 
       expect(weather.id).to eq(1)
-      expect(weather.date.strftime(Weather::DATE_FORMAT)).to eq("1985-01-01")
+      expect(weather.date.strftime(DateHelper::DATE_FORMAT)).to eq("1985-01-01")
       expect(ActiveSupport::JSON.decode(weather.temperature)).to eq(temperature_array)
     end
   end
