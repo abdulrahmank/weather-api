@@ -3,14 +3,16 @@ class Weather < ActiveRecord::Base
   belongs_to :location
 
   def self.create_with_location(params)
-    location = Location.create(lat: params[:location][:lat],
-                               lon: params[:location][:lon],
-                               city: params[:location][:city],
-                               state: params[:location][:state])
+    location = Location.create_with(lat: params[:location][:lat],
+                                    lon: params[:location][:lon],
+                                    city: params[:location][:city],
+                                    state: params[:location][:state])
+                   .find_or_create_by(lat: params[:location][:lat],
+                                      lon: params[:location][:lon])
     self.create(id: params[:id],
                 date: Date.strptime(params[:date], DATE_FORMAT),
                 location_id: location.id,
-                temperature: params[:temperature].map{|t| t.to_f }.to_json)
+                temperature: params[:temperature].map { |t| t.to_f }.to_json)
   end
 
   def as_json
